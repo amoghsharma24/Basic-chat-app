@@ -15,6 +15,8 @@ io.on("connection", (socket) => {
   });
 });
 
+// trial commit
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
