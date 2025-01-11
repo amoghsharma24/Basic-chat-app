@@ -1,45 +1,66 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>CHAT APP</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <h1>Chatting!</h1>
-        <input type="text" id="message" placeholder="Enter your message" />
-        <button id="send">Send</button>
-        
-        <div id = "messages"></div>
-        
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Chat App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>Chat App</h1>
 
+    <div>
+      <input type="text" id="username" placeholder="Enter your name" />
+      <button id="setName">Set Name</button>
+    </div>
 
+    <div id="messages"></div>
 
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-            const socket = io();
-            const btn = document.getElementById("send");
-            const input = document.getElementById("message");
+    <div>
+      <input type="text" id="message" placeholder="Enter your message" />
+      <button id="send">Send</button>
+    </div>
 
-            const allMessages = document.getElementById("messages");
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const btn = document.getElementById("send");
+      const setNameBtn = document.getElementById("setName");
+      const input = document.getElementById("message");
+      const usernameInput = document.getElementById("username");
+      const allMessages = document.getElementById("messages");
 
-            socket.on("message", (message) => {
-                const p = document.createElement("p");
-                p.innerText = message;
-                allMessages.appendChild(p);
-            })
+      let username = "";
 
-            btn.addEventListener("click", () => {
-                const message = input.value;
-                socket.emit("user-message", message);
-            })
-        </script>
-    </body>
+      // Set the username
+      setNameBtn.addEventListener("click", () => {
+        username = usernameInput.value.trim();
+        if (username) {
+          alert(`Username set to: ${username}`);
+          usernameInput.disabled = true;
+          setNameBtn.disabled = true;
+        }
+      });
+
+      // Display incoming messages
+      socket.on("message", (data) => {
+        const { user, message } = data;
+        const p = document.createElement("p");
+        p.innerText = `${user}: ${message}`;
+        allMessages.appendChild(p);
+      });
+
+      // Send a message
+      btn.addEventListener("click", () => {
+        const message = input.value.trim();
+        if (message && username) {
+          socket.emit("user-message", { user: username, message });
+          input.value = ""; // Clear the input field
+        } else if (!username) {
+          alert("Please set your username before sending a message.");
+        }
+      });
+    </script>
+  </body>
 </html>
