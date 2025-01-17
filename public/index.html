@@ -36,6 +36,29 @@
         const usernameInput = document.getElementById("username");
         const allMessages = document.getElementById("messages");
         let username = "";
+        let lastMessageUser = null;
+        let currentMessageGroup = null;
+
+        // Create new message group
+        function createMessageGroup(user, isCurrentUser) {
+            const group = document.createElement("div");
+            group.className = `message-group ${isCurrentUser ? 'sent' : 'received'}`;
+            
+            const usernameElement = document.createElement("div");
+            usernameElement.className = "username";
+            usernameElement.textContent = user;
+            group.appendChild(usernameElement);
+            
+            return group;
+        }
+
+        // Add message to group
+        function addMessageToGroup(group, message) {
+            const bubble = document.createElement("div");
+            bubble.className = "message-bubble";
+            bubble.textContent = message;
+            group.appendChild(bubble);
+        }
 
         // Set the username
         setNameBtn.addEventListener("click", () => {
@@ -50,9 +73,19 @@
         // Display incoming messages
         socket.on("message", (data) => {
             const { user, message } = data;
-            const p = document.createElement("p");
-            p.innerText = `${user}: ${message}`;
-            allMessages.appendChild(p);
+            const isCurrentUser = user === username;
+
+            // Check if we should create a new message group
+            if (lastMessageUser !== user) {
+                currentMessageGroup = createMessageGroup(user, isCurrentUser);
+                allMessages.appendChild(currentMessageGroup);
+                lastMessageUser = user;
+            }
+
+            // Add message to current group
+            addMessageToGroup(currentMessageGroup, message);
+
+            // Scroll to bottom
             allMessages.scrollTop = allMessages.scrollHeight;
         });
 
