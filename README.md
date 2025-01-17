@@ -2,6 +2,8 @@
 
 A simple, real-time chat application built with Socket.io that allows users to communicate instantly in a shared chat room.
 
+[check out here!]https://chat-app-l5n9.onrender.com
+
 ## Features
 
 - Real-time messaging using Socket.io
